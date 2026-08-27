@@ -39,11 +39,11 @@ Selection via env config (`AI_PROVIDER_PRIMARY`, fallback chain). Model choice i
 
 ## 3. Planned Features (Phase 7+, value-first)
 
-| Feature | Educational value | Grounding strategy |
-|---|---|---|
-| Course Assistant | Unstick learners mid-lesson | RAG over current lesson/course transcript + content; refuse outside-scope politely |
+| Feature                   | Educational value                   | Grounding strategy                                                                                              |
+| ------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Course Assistant          | Unstick learners mid-lesson         | RAG over current lesson/course transcript + content; refuse outside-scope politely                              |
 | Prompt Practice Evaluator | Feedback on learner-written prompts | Rubric-based evaluation (clarity, context, constraints, structure, output requirements) against lesson criteria |
-| Next-step recommendations | Reduce "what now?" friction | Deterministic rules from progress data first; model-assisted ranking only if rules prove insufficient |
+| Next-step recommendations | Reduce "what now?" friction         | Deterministic rules from progress data first; model-assisted ranking only if rules prove insufficient           |
 
 Explicitly rejected for launch: general-purpose chatbot, AI-generated courses, autonomous agents acting on user accounts.
 

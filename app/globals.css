@@ -1,26 +1,348 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  EL-SHEMEY — premium cartoon-tech AI learning universe.
+  Dark cinematic environment: deep navy-black, indigo/violet light,
+  controlled electric accents. The grid is the underlying system of the
+  world; Shimmy (the character) lives inside it. Light-first is gone —
+  this is a dark-first identity by owner directive.
+*/
+
+@theme {
+  /* Environment — deep graphite-blue, dark first */
+  --color-base: #05070b;
+  --color-surface: #0a0e14;
+  --color-raised: #0f141d;
+  --color-hover: #18202e;
+
+  /* Structure */
+  --color-edge: #202836;
+  --color-edge-strong: #33405a;
+
+  /* Ink */
+  --color-fg: #f4f7fb;
+  --color-soft: #9aa5b4;
+  --color-faint: #69748a;
+
+  /* Accents */
+  --color-indigo: #5872f5;
+  --color-indigo-strong: #4557db;
+  --color-violet: #a487ff;
+  --color-electric: #56c2ff;
+  --color-gold: #f0c24b;
+
+  /* Course levels */
+  --color-beginner: #35d49e;
+  --color-intermediate: #6e8cff;
+  --color-advanced: #ff8a5c;
+
+  /* Semantic */
+  --color-success: #30c98b;
+  --color-warning: #e8b653;
+  --color-error: #f27277;
+  --color-error-deep: #c2404d;
+
+  /* Shape language stays restrained even in a cartoon world */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Depth: layered darkness + one restrained glow per level */
+  --shadow-card: 0 16px 32px -20px rgb(0 0 0 / 0.7);
+  --shadow-lift: 0 24px 48px -24px rgb(0 0 0 / 0.8);
+  --shadow-glow: 0 0 28px -8px rgb(110 121 255 / 0.45);
+
+  /* Motion vocabulary */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-settle: shemey-settle 0.55s var(--ease-settle) both;
+  --animate-settle-late: shemey-settle 0.55s var(--ease-settle) 0.12s both;
+  --animate-settle-last: shemey-settle 0.55s var(--ease-settle) 0.24s both;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic:
+    var(--font-plex-sans-arabic), var(--font-plex-sans), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes shemey-settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes shemey-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes node-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(86 194 255 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(86 194 255 / 0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-fg);
+  }
+
+  ::selection {
+    background-color: var(--color-indigo);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-electric);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /*
+    THE GRID — the underlying system of the EL-SHEMEY universe.
+    Indigo lines fading into darkness. Supporting layer, never over text.
+  */
+  .surface-grid {
+    background-image:
+      linear-gradient(to right, rgb(148 168 204 / 0.09) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 168 204 / 0.09) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .surface-grid-fine {
+    background-image:
+      linear-gradient(to right, rgb(148 168 204 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 168 204 / 0.06) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* Grid that dissolves into the environment (hero backdrops). */
+  .grid-dissolve {
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 75%);
+  }
+
+  /* Custom-drawn checkbox / radio — deterministic across platforms */
+  .sh-choice {
+    appearance: none;
+    display: inline-grid;
+    place-content: center;
+    border: 2px solid var(--color-edge-strong);
+    border-radius: var(--radius-xs);
+    background-color: var(--color-base);
+    cursor: pointer;
+    transition:
+      background-color 0.15s,
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+
+  .sh-choice:hover {
+    border-color: var(--color-indigo);
+  }
+
+  .sh-choice--check {
+    border-radius: var(--radius-xs);
+  }
+
+  .sh-choice--dot {
+    border-radius: 9999px;
+  }
+
+  .sh-choice:checked {
+    border-color: var(--color-indigo);
+    background-color: var(--color-indigo);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .sh-choice--check:checked::before {
+    content: "";
+    width: 60%;
+    height: 60%;
+    background-color: #ffffff;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  .sh-choice--dot:checked::before {
+    content: "";
+    width: 46%;
+    height: 46%;
+    border-radius: 9999px;
+    background-color: #ffffff;
+  }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentcolor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: spinner-rotate 0.7s linear infinite;
+  }
+
+  @keyframes spinner-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Skeleton shimmer — moonlight sweep */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-hover);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(238 237 248 / 0.06),
+      transparent
+    );
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-sweep {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Character micro-motion */
+  .floaty {
+    animation: shemey-float 5.5s ease-in-out infinite;
+  }
+
+  .floaty-late {
+    animation: shemey-float 5.5s ease-in-out 1.4s infinite;
+  }
+
+  .node-live {
+    animation: node-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* Hero learning demo */
+  .caret-blink {
+    animation: caret-blink 0.9s steps(1) infinite;
+  }
+
+  @keyframes caret-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* One-shot brightness lift on the grid when the result lands */
+  .grid-pulse-once {
+    animation: grid-pulse 0.9s ease-out 1;
+  }
+
+  @keyframes grid-pulse {
+    35% {
+      filter: brightness(1.4);
+    }
+  }
+
+  /* Smooth restart of the demo loop */
+  .demo-restart {
+    animation: demo-restart 0.45s ease-out both;
+  }
+
+  @keyframes demo-restart {
+    from {
+      opacity: 0.25;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .shimmy-blink {
+    animation: blink 4.2s infinite;
+    transform-origin: center;
+  }
+
+  /*
+    Scroll-driven reveal — progressive enhancement only.
+    Browsers without `animation-timeline: view()` simply show content.
+  */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-scroll {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 42%;
+      }
+    }
+  }
+
+  @keyframes reveal-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }

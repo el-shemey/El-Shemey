@@ -1,0 +1,166 @@
+/* EL-SHEMEY player skin — dark graphite, technical, indigo/electric accents.
+   Overrides Video.js defaults; scoped under .vjs-elshemey. */
+
+.vjs-elshemey {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-edge);
+  background: var(--color-base);
+  color: var(--color-fg);
+  font-family: var(--font-sans, inherit);
+}
+
+/* Big play button: minimal technical square with indigo accent */
+.vjs-elshemey .vjs-big-play-button {
+  width: 72px;
+  height: 52px;
+  line-height: 52px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-indigo) 92%, transparent);
+  box-shadow:
+    0 0 0 1px var(--color-edge-strong),
+    0 8px 30px rgb(0 0 0 / 55%);
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.vjs-elshemey:hover .vjs-big-play-button,
+.vjs-elshemey .vjs-big-play-button:focus-visible {
+  background: var(--color-indigo-strong);
+  transform: translate(-50%, -50%) scale(1.04);
+}
+.vjs-elshemey .vjs-big-play-button .vjs-icon-placeholder::before {
+  font-size: 26px;
+  line-height: 52px;
+}
+
+/* Control bar: graphite strip */
+.vjs-elshemey .vjs-control-bar {
+  height: 3.4em;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-base) 96%, transparent),
+    color-mix(in srgb, var(--color-base) 70%, transparent)
+  );
+  border-top: 1px solid var(--color-edge);
+}
+.vjs-elshemey .vjs-control {
+  color: var(--color-soft);
+}
+.vjs-elshemey .vjs-control:hover,
+.vjs-elshemey .vjs-control:focus-visible {
+  color: var(--color-fg);
+}
+.vjs-elshemey .vjs-button > .vjs-icon-placeholder::before {
+  line-height: 3.4em;
+}
+
+/* Progress: technical track + indigo playhead + electric load bar */
+.vjs-elshemey .vjs-progress-control {
+  height: initial;
+}
+.vjs-elshemey .vjs-progress-holder {
+  height: 5px;
+  border-radius: 2px;
+  background: var(--color-raised);
+  margin-left: 0.75em;
+  margin-right: 0.75em;
+}
+.vjs-elshemey .vjs-load-progress {
+  background: color-mix(in srgb, var(--color-electric) 22%, transparent);
+}
+.vjs-elshemey .vjs-play-progress {
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-indigo), var(--color-electric));
+}
+.vjs-elshemey .vjs-play-progress::before {
+  color: var(--color-electric);
+  text-shadow: none;
+}
+.vjs-elshemey .vjs-slider {
+  background-color: transparent;
+}
+
+/* Time display: tabular mono */
+.vjs-elshemey .vjs-time-control {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72em;
+  letter-spacing: 0.04em;
+  color: var(--color-soft);
+  padding-inline: 0.4em;
+}
+.vjs-elshemey .vjs-current-time,
+.vjs-elshemey .vjs-duration {
+  display: block;
+}
+.vjs-elshemey .vjs-remaining-time {
+  display: none;
+}
+
+/* Menus (speed, captions): dark panels, no generic SaaS look */
+.vjs-elshemey .vjs-menu-content {
+  background: var(--color-raised);
+  border: 1px solid var(--color-edge);
+  border-radius: 4px;
+  font-family: inherit;
+}
+.vjs-elshemey .vjs-menu li.vjs-menu-item:hover,
+.vjs-elshemey .vjs-menu li.vjs-menu-item:focus-visible {
+  background: var(--color-hover);
+  color: var(--color-fg);
+}
+.vjs-elshemey .vjs-menu li.vjs-selected {
+  background: color-mix(in srgb, var(--color-indigo) 24%, transparent);
+  color: var(--color-fg);
+}
+.vjs-elshemey .vjs-playback-rate .vjs-menu {
+  width: 5em;
+}
+
+/* Volume slider */
+.vjs-elshemey .vjs-volume-bar {
+  margin-right: 0.75em;
+}
+.vjs-elshemey .vjs-volume-level {
+  border-radius: 2px;
+  background: var(--color-indigo);
+}
+
+/* Loading spinner tinted electric */
+.vjs-elshemey .vjs-loading-spinner {
+  border-color: color-mix(in srgb, var(--color-electric) 60%, transparent);
+}
+.vjs-elshemey .vjs-loading-spinner::before,
+.vjs-elshemey .vjs-loading-spinner::after {
+  border-color: var(--color-electric);
+}
+
+/* Captions: readable on dark graphite */
+.vjs-elshemey .vjs-text-track-cue > div,
+.video-js .vjs-caption-settings {
+  background: color-mix(in srgb, var(--color-base) 88%, transparent);
+  color: var(--color-fg);
+}
+.vjs-elshemey .vjs-text-track-display div div div div {
+  background-color: color-mix(in srgb, var(--color-base) 82%, transparent);
+}
+
+/* Custom PiP button icon (uses VJS icon font when available) */
+.vjs-elshemey .vjs-pip-button .vjs-icon-placeholder::before {
+  content: "\f108"; /* vjs icon font glyph fallback */
+  font-family: VideoJS;
+}
+
+/* Error overlay is rendered in React; hide the native one */
+.vjs-elshemey .vjs-error .vjs-error-display {
+  display: none;
+}
+
+/* RTL layouts keep the control bar LTR for time semantics */
+[dir="rtl"] .vjs-elshemey .vjs-control-bar {
+  direction: ltr;
+}

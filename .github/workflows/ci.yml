@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: elshemey_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/elshemey_ci
+      AUTH_SECRET: ci-only-secret-not-production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma schema validation
+        run: npx prisma validate
+
+      - name: Apply migrations (fresh database)
+        run: npx prisma migrate deploy
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Seed
+        run: npm run db:seed
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Unit + integration tests
+        run: npx vitest run
+
+      - name: Client/server boundary check
+        run: npm run check:boundaries
+
+      - name: Production build
+        run: npm run build
+
+      # Fails CI when a credential-shaped string appears in source/docs.
+      # Prints ONLY file:line — never the matched content.
+      - name: Secret scan
+        run: |
+          set -e
+          PATTERN="(AKIA[0-9A-Z]{16}|sk_live_[A-Za-z0-9]{8,}|sk_test_[A-Za-z0-9]{12,}|-----BEGIN (RSA |EC )?PRIVATE KEY-----|PAYMOB_API_KEY=['\"]?[A-Za-z0-9]|S3_SECRET_ACCESS_KEY=['\"]?[A-Za-z0-9])"
+          HITS=$(grep -rInE "$PATTERN" \
+            --include="*.ts" --include="*.tsx" --include="*.yml" --include="*.md" --include="*.json" \
+            app lib components features prisma docs .github 2>/dev/null \
+            | grep -v "\.test\." \
+            | cut -d: -f1-2 || true)
+          if [ -n "$HITS" ]; then
+            echo "Potential credential detected:"
+            echo "$HITS"
+            exit 1
+          fi
+          # Placeholders in .env.example must remain EMPTY by contract.
+          if grep -qE "^(PAYMOB_API_KEY|PAYMOB_HMAC_SECRET|S3_SECRET_ACCESS_KEY|AUTH_SECRET)=.+" .env.example; then
+            echo "Potential credential detected: .env.example (non-empty placeholder)"
+            exit 1
+          fi

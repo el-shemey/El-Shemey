@@ -33,23 +33,23 @@
 
 ## 2. Stack (fixed for MVP)
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Framework | Next.js (App Router) + TypeScript | RSC for fast public pages, route handlers for webhooks/API |
-| Styling | Tailwind CSS | Design tokens as CSS variables + Tailwind config |
-| UI primitives | shadcn/ui (selectively) + custom components | Custom where identity matters |
-| DB | PostgreSQL (Neon managed) | |
-| ORM | Prisma | Migrations in repo |
-| Auth | Auth.js v5 (credentials + email verification) | Session cookies, JWT strategy for edge middleware |
-| Validation | Zod | Shared schemas client+server |
-| Payments | Provider adapter pattern; Paymob first | See PAYMENTS.md |
-| Storage | Cloudflare R2 (S3-compatible) | Signed URLs for protected assets |
-| Video | Bunny Stream with signed embed tokens | See SECURITY.md §6 |
-| Email | Resend + React Email templates | Verification, reset, receipts, dunning |
-| AI | Internal provider abstraction (`lib/ai`) | See AI_ARCHITECTURE.md — post-MVP features only |
-| Analytics | Plausible (or self-hostable equivalent) + first-party funnel events table | |
-| Error tracking | Sentry | |
-| Hosting | Vercel + Neon branch previews | |
+| Layer          | Choice                                                                    | Notes                                                      |
+| -------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Framework      | Next.js (App Router) + TypeScript                                         | RSC for fast public pages, route handlers for webhooks/API |
+| Styling        | Tailwind CSS                                                              | Design tokens as CSS variables + Tailwind config           |
+| UI primitives  | shadcn/ui (selectively) + custom components                               | Custom where identity matters                              |
+| DB             | PostgreSQL (Neon managed)                                                 |                                                            |
+| ORM            | Prisma                                                                    | Migrations in repo                                         |
+| Auth           | Auth.js v5 (credentials + email verification)                             | Session cookies, JWT strategy for edge middleware          |
+| Validation     | Zod                                                                       | Shared schemas client+server                               |
+| Payments       | Provider adapter pattern; Paymob first                                    | See PAYMENTS.md                                            |
+| Storage        | Cloudflare R2 (S3-compatible)                                             | Signed URLs for protected assets                           |
+| Video          | Bunny Stream with signed embed tokens                                     | See SECURITY.md §6                                         |
+| Email          | Resend + React Email templates                                            | Verification, reset, receipts, dunning                     |
+| AI             | Internal provider abstraction (`lib/ai`)                                  | See AI_ARCHITECTURE.md — post-MVP features only            |
+| Analytics      | Plausible (or self-hostable equivalent) + first-party funnel events table |                                                            |
+| Error tracking | Sentry                                                                    |                                                            |
+| Hosting        | Vercel + Neon branch previews                                             |                                                            |
 
 ## 3. Repository Layout
 
@@ -79,6 +79,7 @@ el-shemey/
 ```
 
 Rules:
+
 - `features/*` owns domain logic; `app/*` is thin wiring.
 - All money values come from `config/plans.ts` or DB — never inline in components.
 - Entitlement decisions go through exactly one function: `lib/entitlements.ts`.
@@ -128,7 +129,7 @@ State machine owned by the backend:
 
 - Single source of truth: `Subscription` row per user (latest), plus immutable `SubscriptionEvent` audit trail appended by webhooks.
 - Webhooks are idempotent (event ID dedup table) and HMAC/signature verified before touching state.
-- Entitlement check: `hasPremiumAccess(userId)` computed from subscription state + period dates — called server-side everywhere premium content is served. Client may *display* state but never *grants* it.
+- Entitlement check: `hasPremiumAccess(userId)` computed from subscription state + period dates — called server-side everywhere premium content is served. Client may _display_ state but never _grants_ it.
 
 ## 7. Payment Architecture (summary)
 
@@ -149,11 +150,11 @@ Internal gateway interface; providers pluggable (Anthropic/OpenAI/Google). Keys 
 
 ## 9. Environments & Operations
 
-| Env | Purpose | Data |
-|---|---|---|
-| Local | dev, Neon branch + seeded data | synthetic |
-| Preview | per-PR Vercel preview | synthetic |
-| Production | live | real |
+| Env        | Purpose                        | Data      |
+| ---------- | ------------------------------ | --------- |
+| Local      | dev, Neon branch + seeded data | synthetic |
+| Preview    | per-PR Vercel preview          | synthetic |
+| Production | live                           | real      |
 
 - Backups: Neon PITR + daily logical dumps to R2 (30-day retention).
 - Monitoring: Sentry (errors), Vercel analytics, uptime ping, webhook failure alerts.

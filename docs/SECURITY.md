@@ -9,14 +9,14 @@ Primary adversaries: credential stuffers, content pirates (bypassing paywall), a
 
 ## 1. Authentication Controls
 
-| Control | Implementation |
-|---|---|
-| Password hashing | Argon2id (appropriate memory/time params) |
-| Email verification | Hashed token, 24h expiry, required before login |
-| Password reset | Hashed single-use token, 30-min expiry, invalidates all sessions |
-| Brute force | Rate limit login per IP + per account (exponential backoff); generic error messages |
-| Session security | HttpOnly, Secure, SameSite=Lax cookies; server-side revocable sessions; rotation on privilege change |
-| Session invalidation | On password change/reset; admin-forced logout capability |
+| Control              | Implementation                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------- |
+| Password hashing     | Argon2id (appropriate memory/time params)                                                            |
+| Email verification   | Hashed token, 24h expiry, required before login                                                      |
+| Password reset       | Hashed single-use token, 30-min expiry, invalidates all sessions                                     |
+| Brute force          | Rate limit login per IP + per account (exponential backoff); generic error messages                  |
+| Session security     | HttpOnly, Secure, SameSite=Lax cookies; server-side revocable sessions; rotation on privilege change |
+| Session invalidation | On password change/reset; admin-forced logout capability                                             |
 
 No custom cryptography. Auth.js v5 primitives only.
 
@@ -44,19 +44,20 @@ Known residual risk: determined subscribers can screen-record. Accepted (busines
 
 ## 4. Application Security
 
-| Area | Control |
-|---|---|
-| Input validation | Zod schemas on every mutation boundary (Server Actions, route handlers, webhooks) |
-| Output encoding | React escaping defaults; no `dangerouslySetInnerHTML` on user content; rich text sanitized server-side |
-| CSRF | Auth.js built-in CSRF tokens for auth routes; Server Actions have origin checks; SameSite cookies |
-| SQL injection | Prisma parameterized queries exclusively |
-| XSS | Strict CSP (below), sanitization of any rich-text input |
-| Clickjacking | `frame-ancestors 'none'` except verified video embed frames |
-| Headers | CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy |
-| Dependencies | `npm audit` in CI; Dependabot/Renovate |
-| Errors | No stack traces/secrets in responses; Sentry with scrubbing |
+| Area             | Control                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| Input validation | Zod schemas on every mutation boundary (Server Actions, route handlers, webhooks)                      |
+| Output encoding  | React escaping defaults; no `dangerouslySetInnerHTML` on user content; rich text sanitized server-side |
+| CSRF             | Auth.js built-in CSRF tokens for auth routes; Server Actions have origin checks; SameSite cookies      |
+| SQL injection    | Prisma parameterized queries exclusively                                                               |
+| XSS              | Strict CSP (below), sanitization of any rich-text input                                                |
+| Clickjacking     | `frame-ancestors 'none'` except verified video embed frames                                            |
+| Headers          | CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy                                 |
+| Dependencies     | `npm audit` in CI; Dependabot/Renovate                                                                 |
+| Errors           | No stack traces/secrets in responses; Sentry with scrubbing                                            |
 
 CSP baseline (tightened during hardening):
+
 ```
 default-src 'self'; script-src 'self' 'nonce-*'; frame-src bunny.net;
 img-src 'self' data: cdn.bunny.net; connect-src 'self' ...api origins
@@ -64,13 +65,13 @@ img-src 'self' data: cdn.bunny.net; connect-src 'self' ...api origins
 
 ## 5. Rate Limiting & Abuse Prevention
 
-| Endpoint class | Limit (initial) |
-|---|---|
-| Login / register / reset | 5/min per IP, 10/hour per account |
-| Progress writes | sane per-user cap |
-| Checkout initiation | 5/hour per user |
-| Webhook endpoint | signature-gated; no public rate dependency |
-| Future AI endpoints | per-user daily quota enforced server-side |
+| Endpoint class           | Limit (initial)                            |
+| ------------------------ | ------------------------------------------ |
+| Login / register / reset | 5/min per IP, 10/hour per account          |
+| Progress writes          | sane per-user cap                          |
+| Checkout initiation      | 5/hour per user                            |
+| Webhook endpoint         | signature-gated; no public rate dependency |
+| Future AI endpoints      | per-user daily quota enforced server-side  |
 
 Implementation: Upstash Redis sliding window (or DB-backed fallback in early dev).
 
@@ -117,3 +118,44 @@ Implementation: Upstash Redis sliding window (or DB-backed fallback in early dev
 - [ ] Header/CSP verified in prod
 - [ ] Restore-from-backup drill
 - [ ] Independent review of payment + entitlement code paths
+
+## Phase 3 security posture (as built)
+
+**IMPLEMENTED NOW:** server-only Prisma singleton (`lib/server/db.ts`, guarded by `server-only` — client imports fail the build); DB credentials exclusively via env (`DATABASE_URL`); Zod validation schemas at every learning-mutation boundary (`lib/domain/schemas.ts`); server-authoritative completion (client input never sets completion truth); entitlement checks centralized in `canViewLesson` + `EntitlementProvider`; defensive progress reconciliation (orphaned records ignored); Payment schema encodes webhook idempotency ((provider, providerRef) unique + idempotencyKey) and prohibits sensitive payload storage by design.
+
+**DEFERRED TO PHASE 4 (auth):** session issuance/verification, userId derivation from verified sessions, login/reset rate limiting, brute-force + enumeration protection, CSRF hardening for cookie flows.
+
+**DEFERRED TO PHASE 5 (payments):** webhook signature verification, payment state machine enforcement, refund authorization, provider credential handling.
+
+**DEFERRED TO PHASE 6+:** rate limiting on content endpoints, signed video URLs, security headers/CSP finalization, dependency audit cadence.
+
+No complete-security claim is made until Phases 4–6 land their controls.
+
+## Phase 4 security posture (as built)
+
+**IMPLEMENTED NOW:** Argon2id credential hashing (@node-rs/argon2, unique salts); Auth.js v5 JWT sessions (7d, HttpOnly/Secure/SameSite=Lax via framework defaults, AUTH_SECRET env-only) with sessionVersion revocation verified server-side per protected surface; email verification + password reset with hashed single-use expiring tokens (SHA-256 at rest, timing-safe compare, sibling-token invalidation); enumeration-safe registration/reset/login responses; typed CredentialsSignin subclass only for EMAIL_NOT_VERIFIED behind a correct password; rate limiting boundary (per-IP + per-account buckets on login/register/reset/resend; in-memory dev impl, Upstash-ready interface); security headers baseline (nosniff, DENY frames, strict-origin-when-cross-origin, Permissions-Policy) applied globally; AuthEvent audit trail (type/email/userId/outcome only); coarse middleware gate + fine-grained requireUser()/requireRole() layered authorization.
+
+**DEFERRED TO PHASE 5:** payment webhook signature verification, refund authorization, subscription state-machine enforcement, provider credential handling.
+
+**DEFERRED TO LATER PHASES:** full CSP with nonces (designed alongside Bunny embeds in Phase 5/6), distributed rate limiting activation (interface ready), individual-session listing/revocation UI, OAuth providers.
+
+## Phase 6 � /learn edge gate adjustment (verified)
+
+The edge middleware no longer hard-blocks anonymous visitors on /[lang]/learn.
+Reason: published FREE lessons are an intended PUBLIC PREVIEW (product access model).
+The authorization layer remains entirely server-side:
+
+- Dashboard/overview pages: getUser() ? redirect to login when anonymous.
+- Lesson pages: anonymous visitors only ever reach getPreviewLessonView(), which
+  returns published FREE lesson metadata/body only; PRO/unpublished ? redirect or 404.
+- No signed video URL is ever generated for anonymous users (authorizePlayback requires
+  a verified userId).
+- Progress mutations (/api/learn/progress) require a session (401 otherwise).
+  PRO content is never rendered server-side for unentitled users � not even in RSC payloads.
+
+## Phase 10 � headers & provider isolation
+
+- CSP active (default-src 'self'; frame-src limited to Paymob sandbox+production hosts; object-src 'none'; frame-ancestors 'none'). script-src retains 'unsafe-inline' (+ 'unsafe-eval' dev-only) � Next.js runtime requirement; nonce-based strict CSP documented as future hardening.
+- HSTS always sent (browsers ignore over HTTP; mandatory once TLS is live).
+- FakePay isolation enforced in code, not comments: registry resolves it only when NODE_ENV !== "production" AND FAKEPAY_ENABLED=1; production builds cannot select it.
+- Account deletion: admin-initiated, cascades learning data, transfers created-media ownership to acting admin, RETAINS payment/audit rows (FK policy), audited as user.deleted_anonymized.

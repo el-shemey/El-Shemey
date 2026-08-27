@@ -31,14 +31,14 @@ Functional · Visual (matches design system) · Responsive · Accessible · Secu
 
 ## 4. Quality Tooling (set up in Phase 1 bootstrap)
 
-| Concern | Tool |
-|---|---|
-| Types | TypeScript strict |
-| Lint/format | ESLint + Prettier |
-| Unit/integration | Vitest |
-| E2E | Playwright (critical journeys: signup, learn, subscribe) |
-| DB | Prisma migrate (+ shadow DB); seed per environment |
-| CI | GitHub Actions: lint, typecheck, test, build on every PR |
+| Concern          | Tool                                                     |
+| ---------------- | -------------------------------------------------------- |
+| Types            | TypeScript strict                                        |
+| Lint/format      | ESLint + Prettier                                        |
+| Unit/integration | Vitest                                                   |
+| E2E              | Playwright (critical journeys: signup, learn, subscribe) |
+| DB               | Prisma migrate (+ shadow DB); seed per environment       |
+| CI               | GitHub Actions: lint, typecheck, test, build on every PR |
 
 ## 5. Testing Priorities
 

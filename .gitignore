@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.dev-emails/
+.dev-sms/
+OWNER-LOGIN.txt
+
+# Self-hosted video storage (local development)
+/storage/
+# debug artifacts (never commit)
+learner-debug.txt
+db-dump.txt
+db-dump.mts
+Report1.md
+mail-test-result.txt

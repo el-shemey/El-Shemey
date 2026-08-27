@@ -261,3 +261,11 @@ model LessonProgress {
 - **Bilingual fields:** paired `*En`/`*Ar` columns for MVP simplicity; migrate to a translation table only if a third locale becomes real.
 - **Deletion policy:** Users soft-deleted (anonymized) to preserve financial audit integrity; content uses cascade deletes within course trees.
 - **Seed:** seed script creates categories, demo courses (incl. "Claude Mastery" with free/premium split matching spec §12), plans from `config/plans.ts`.
+
+## Phase 3 implementation notes (schema as built)
+
+- `prisma/schema.prisma` implements this design with evolutions: `LessonType` enum added (LESSON/QUIZ/PROJECT); `Lesson.contentRef Json?` is the opaque content boundary; `Module @@unique([courseId, position])`; `LessonProgress.completionEvents` counts duplicate/retry completions while `completedAt` is preserved from first completion (idempotent); module progress derives from lesson records — no ModuleProgress table.
+- Minimal `User` identity anchor (id/email) — credentials arrived in Phase 4. **Email invariant: stored normalized to lowercase; every lookup MUST normalize before querying** (`normalizeEmail`).
+- `Payment` + `PaymentMethod` + `PaymentStatus` prepared for Phase 5 (see PAYMENTS.md §9 / D21): minor-unit money, EGP default, `(provider, providerRef)` unique, idempotency keys, no sensitive payloads.
+- Initial migration: `prisma/migrations/000_init/migration.sql` (generated offline via `migrate diff`); apply with `prisma migrate deploy` once DATABASE_URL points at Neon.
+- Seed: `prisma/seed.ts` — deterministic upserts of the course catalog skeleton (no users/payments/pricing).

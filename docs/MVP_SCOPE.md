@@ -5,6 +5,7 @@
 ## In Scope (MVP)
 
 ### Public website
+
 - [ ] Home (hero, what you learn, free learning, featured courses, PRO section, FAQ, final CTA)
 - [ ] Explore / course catalog with categories
 - [ ] Course detail page (editorial, curriculum, free/premium markers)
@@ -15,6 +16,7 @@
 - [ ] SEO baseline: metadata, OG, sitemap, robots, Course structured data
 
 ### Learning core
+
 - [ ] Player: course nav sidebar + lesson content + completion + next/prev
 - [ ] Video lessons (protected playback) + rich text lessons + downloadable resources
 - [ ] Free/PREMIUM access levels enforced server-side
@@ -22,11 +24,13 @@
 - [ ] Enrollment created automatically on first lesson start
 
 ### User system
+
 - [ ] Dashboard (greeting, continue learning, progress summary, recommendations placeholder)
 - [ ] My Learning list
 - [ ] Profile (name, locale, password change)
 
 ### Business
+
 - [ ] Paymob checkout (hosted page) monthly/yearly
 - [ ] Webhook receiver → state machine → entitlements
 - [ ] Cancellation at period end, expiration, failed-payment grace + dunning emails
@@ -34,6 +38,7 @@
 - [ ] Subscription management page for users
 
 ### Admin (minimal CMS)
+
 - [ ] Courses/modules/lessons CRUD, publish toggle, free/premium toggle, reorder
 - [ ] User search + inspect + subscription view
 - [ ] Metrics v0: active subscribers, recent payments, MRR estimate
